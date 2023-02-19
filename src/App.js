@@ -1,6 +1,6 @@
 import Map from "./components/map/Map";
 import "bootstrap/dist/css/bootstrap.css";
-import Info from "./info/Info";
+import Info from "./components/info/Info";
 import Summary from "./components/summary/Summary";
 import { useState } from "react";
 // import './App.css';
