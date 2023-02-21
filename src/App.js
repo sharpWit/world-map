@@ -3,16 +3,26 @@ import Map from "./components/map/Map";
 import "bootstrap/dist/css/bootstrap.css";
 import Info from "./components/info/Info";
 import Summary from "./components/summary/Summary";
-import Wiki from "./components/info/Wiki";
+import Country from "./components/info/Country";
+import wtf from "wtf_wikipedia";
 
 function App() {
   const [selectedCountry, setSelectedCountry] = useState("iran");
-  const [summary, setSummary] = useState("");
+  const [summary, setSummary] = useState("summary");
+  const [infobox, setInfobox] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-      const wikiText = await wiki(selectedCountry);
+      const doc = await wtf.fetch(selectedCountry, "en");
+      const [wikiText, infobox] = await Promise.all([
+        doc.text(),
+        doc.infobox().keyValue(),
+ 
+      ]);
+
       setSummary(wikiText);
+      setInfobox(infobox);
+
     }
     fetchData();
   }, [selectedCountry]);
@@ -28,22 +38,14 @@ function App() {
           <Map handleSelectedCountry={handleSelectedCountry} />
         </div>
         <div className="col-12 col-md-3">
-          <Info />
+          <Info infobox={infobox} />
         </div>
       </div>
-      <div className="row mt-3">
-        <Wiki country={selectedCountry} />
-        <Summary summary={summary} />
-      </div>
+      <Country country={selectedCountry} />
+
+      <Summary summary={summary} />
     </div>
   );
 }
 
 export default App;
-
-async function wiki(country) {
-  const wtf = await import("wtf_wikipedia");
-  const doc = await wtf.default.fetch(country);
-  const text = doc.text();
-  return text;
-}
